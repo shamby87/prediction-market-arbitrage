@@ -1,0 +1,32 @@
+{
+  "name": "prediction-market-arbitrage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shamby87/prediction-market-arbitrage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shamby87/prediction-market-arbitrage/issues"
+  },
+  "homepage": "https://github.com/shamby87/prediction-market-arbitrage#readme",
+  "dependencies": {
+    "@polymarket/clob-client": "^5.1.1",
+    "ethers": "^6.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}
