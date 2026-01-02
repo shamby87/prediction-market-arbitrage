@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 import { CONFIG } from "../config";
-import { PolymarketMarket } from "./polyMarkets";
+import { PolymarketMarket } from "./polyClient";
 
 export type OrderBookSide = { price: number; size: number }[];
 
@@ -121,7 +121,7 @@ function handlePriceChange(msg: PriceChangeMsg) {
   }
 }
 
-export function connectMarketWS(assetIds: string[]) {
+export function connectPolymarketOrderbook(assetIds: string[]) {
   const ws = new WebSocket(CONFIG.polyWsMarketUrl);
 
   ws.on("open", () => {

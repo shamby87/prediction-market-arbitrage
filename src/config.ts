@@ -14,10 +14,10 @@ export const CONFIG = {
     "wss://ws-subscriptions-clob.polymarket.com/ws/market", // Polymarket market channel 
   kalshiRestBaseUrl:
     process.env.KALSHI_REST_BASE_URL ??
-    "https://api.kalshi.com/trade-api/v2",
+    "https://api.elections.kalshi.com/trade-api/v2",
   kalshiWsUrl:
     process.env.KALSHI_WS_URL ??
-    "wss://api.kalshi.com/trade-api/ws/v2",
+    "wss://api.elections.kalshi.com/trade-api/ws/v2",
   minEdge: Number(process.env.MIN_EDGE ?? "0.01"),
   discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL ?? "",
   discordNotifyUserId: process.env.DISCORD_NOTIFY_USER_ID ?? "",
