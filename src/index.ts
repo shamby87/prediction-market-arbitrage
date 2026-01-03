@@ -1,10 +1,11 @@
 import { validateConfig, CONFIG } from "./config";
 import { makeClobClient, refreshPolymarketMarkets, polymarketMarkets } from "./poly/polyClient";
-import { connectPolymarketOrderbook, getBooksForMarket } from "./poly/polyOrderbook";
-import { findArbOpportunities } from "./arb";
-import { logMsg } from "./utils";
+import { connectPolymarketOrderbook, getPolyBooksForMarket } from "./poly/polyOrderbook";
+import { logMsg } from "./logging";
 import { kalshiMarkets, makeKalshiMarketsApi, refreshKalshiMarkets } from "./kalshi/kalshiClient";
 import { connectKalshiOrderbook } from "./kalshi/kalshiOrderbook";
+import { buildPolyToKalshiBookMap } from "./helpers";
+import { findArbOpportunities } from "./arb";
 
 async function main() {
   validateConfig();
@@ -37,14 +38,17 @@ async function main() {
 
   connectPolymarketOrderbook(assetIds);
 
-  const kalshiTickers = Array.from(kalshiMarkets.markets.values()).map((m) => m.ticker);
+  const kalshiTickers = Array.from(kalshiMarkets.markets.values().map((m) => m.ticker));
   connectKalshiOrderbook(kalshiTickers);
 
   const kalshiMap = kalshiMarkets.markets;
   const pMap = polymarketMarkets.markets;
 
+  const mapping = buildPolyToKalshiBookMap();
+
   // 4. Periodically scan for arbitrage candidates and log them.
   setInterval(async () => {
+    const opps = findArbOpportunities(mapping);
     // console.log(`Orderbook for market ${markets[0]!.question}:`);
     // const books = getBooksForMarket(markets[0]!);
     // console.log(`[${markets[0]!.tokens[0]!.outcome}] ${JSON.stringify(books[markets[0]!.tokens[0]!.outcome])}`);

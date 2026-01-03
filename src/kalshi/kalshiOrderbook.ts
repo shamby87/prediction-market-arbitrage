@@ -4,14 +4,7 @@ import fs from "fs";
 import path from "path";
 import { CONFIG } from "../config";
 
-export type OrderBookSide = { price: number; size: number }[];
-
-export interface OrderBook {
-  yes: OrderBookSide; // sorted desc by price
-  no: OrderBookSide; // sorted desc by price
-}
-
-export const kalshiBooks: Record<string, OrderBook> = {}; // ticker -> book
+export const kalshiBooks: Record<string, KalshiOrderBook> = {}; // ticker -> book
 
 // Sign text with RSA-PSS SHA256 and base64-encode. 
 function signPss(privateKeyPem: string, text: string): string {
@@ -120,16 +113,16 @@ function handleSnapshot(msg: OrderbookSnapshotMsg) {
   yes.sort((a, b) => b.price - a.price);
   no.sort((a, b) => b.price - a.price);
 
-  kalshiBooks[tkr] = { yes, no };
+  kalshiBooks[tkr] = { yesBids: yes, noBids: no };
 }
 
 function handleDelta(msg: OrderbookDeltaMsg) {
   const tkr = msg.msg.market_ticker;
-  const book = kalshiBooks[tkr] || { yes: [], no: [] };
+  const book = kalshiBooks[tkr] || { yesBids: [], noBids: [] };
 
   const price = msg.msg.price;
   const delta = msg.msg.delta;
-  const sideArray = msg.msg.side === "yes" ? book.yes : book.no;
+  const sideArray = msg.msg.side === "yes" ? book.yesBids : book.noBids;
 
   // Current size at this price; default 0 if not present.
   const existing = sideArray.find((lvl) => lvl.price === price);
@@ -140,7 +133,7 @@ function handleDelta(msg: OrderbookDeltaMsg) {
 
   kalshiBooks[tkr] = book;
 
-  // if (tkr.toLowerCase() === `kxnbagame-26jan01miadet-det`) {
+  // if (tkr.toLowerCase() === `kxnbagame-26jan03minmia-mia`) {
   //   console.log(`Pistons: ${JSON.stringify(kalshiBooks[tkr])}`);
   // }
 }
@@ -201,4 +194,8 @@ export function connectKalshiOrderbook(marketTickers: string[]) {
   });
 
   return ws;
+}
+
+export function getKalshiBookForTicker(ticker: string): KalshiOrderBook | undefined {
+  return kalshiBooks[ticker];
 }

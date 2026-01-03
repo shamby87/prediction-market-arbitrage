@@ -1,15 +1,7 @@
 import WebSocket from "ws";
 import { CONFIG } from "../config";
-import { PolymarketMarket } from "./polyClient";
 
-export type OrderBookSide = { price: number; size: number }[];
-
-export interface OrderBook {
-  bids: OrderBookSide;
-  asks: OrderBookSide;
-}
-
-const books: Record<string, OrderBook> = {};
+const books: Record<string, PolyOrderBook> = {};
 
 interface BookMsg {
   event_type: "book";
@@ -163,12 +155,12 @@ export function connectPolymarketOrderbook(assetIds: string[]) {
   return ws;
 }
 
-export function getBookForToken(tokenId: string): OrderBook | undefined {
+export function getPolyBookForToken(tokenId: string): PolyOrderBook | undefined {
   return books[tokenId];
 }
 
-export function getBooksForMarket(market: PolymarketMarket): Record<string, OrderBook> {
-  const ret : Record<string, OrderBook> = {};
+export function getPolyBooksForMarket(market: PolymarketMarket): Record<string, PolyOrderBook> {
+  const ret : Record<string, PolyOrderBook> = {};
   for (const token of market.tokens) {
     if (books[token.token_id]) {
       ret[token.outcome] = books[token.token_id]!;

@@ -1,11 +1,6 @@
 import { Configuration, MarketApi, Market, GetMarketsStatusEnum, MarketStatusEnum, MarketMarketTypeEnum } from "kalshi-typescript";
 import { CONFIG } from "../config";
 
-export interface KalshiMarkets {
-  markets: Map<string, Market>;
-  lastUpdated: Date | null;
-}
-
 export const kalshiMarkets: KalshiMarkets = {
   markets: new Map(),
   lastUpdated: null,
@@ -55,10 +50,10 @@ export async function refreshKalshiMarkets(api: MarketApi): Promise<void> {
 
 const validTickerPrefixes = [
   "KXNFLGAME",
-  "KXNFLSPREAD",
+  // "KXNFLSPREAD",
   "KXNFLTOTAL",
   "KXNBAGAME",
-  "KXNBASPREAD",
+  // "KXNBASPREAD",
   "KXNBATOTAL",
 ]
 

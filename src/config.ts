@@ -19,6 +19,7 @@ export const CONFIG = {
     process.env.KALSHI_WS_URL ??
     "wss://api.elections.kalshi.com/trade-api/ws/v2",
   minEdge: Number(process.env.MIN_EDGE ?? "0.01"),
+  unitSize: Number(process.env.UNIT_SIZE ?? "100"),
   discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL ?? "",
   discordNotifyUserId: process.env.DISCORD_NOTIFY_USER_ID ?? "",
 };
