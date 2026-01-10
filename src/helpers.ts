@@ -5,8 +5,11 @@ import { polymarketMarkets } from "./poly/polyClient";
 // Kalshi has separate markets for each side of some markets, so 1 polymarket market may map to multiple Kalshi markets that rep each side.
 export type PolymarketKalshiMapping = Map<string, string[]>;
 
+export const polyToKalshiMap: PolymarketKalshiMapping = new Map();
+export const kalshiToPolyMap: Map<string, string> = new Map();
+
 export function buildPolyToKalshiBookMap(): PolymarketKalshiMapping {
-    const map: PolymarketKalshiMapping = new Map();
+    polyToKalshiMap.clear();
     const polyMarkets = polymarketMarkets.markets;
     const kMarkets = kalshiMarkets.markets;
 
@@ -31,7 +34,8 @@ export function buildPolyToKalshiBookMap(): PolymarketKalshiMapping {
                     // console.log(`Kalshi market not found for ticker ${kalshiTicker}, skipping polymarket market ${polyMarket.market_slug}`);
                     continue;
                 }
-                map.set(polyMarket.condition_id, [kalshiTicker]);
+                polyToKalshiMap.set(polyMarket.condition_id, [kalshiTicker]);
+                kalshiToPolyMap.set(kalshiTicker, polyMarket.condition_id);
                 console.log(`Mapping polymarket market ${polyMarket.market_slug} to kalshi ticker ${kalshiTicker}`);
             } else {
                 // Moneyline
@@ -45,7 +49,8 @@ export function buildPolyToKalshiBookMap(): PolymarketKalshiMapping {
                     console.log(`Kalshi market not found for polymarket market ${polyMarket.market_slug}, kalshi tickers [${tickers.join(", ")}]`);
                     continue;
                 }
-                map.set(polyMarket.condition_id, tickers);
+                polyToKalshiMap.set(polyMarket.condition_id, tickers);
+                tickers.forEach((t) => kalshiToPolyMap.set(t, polyMarket.condition_id));
                 console.log(`Mapping polymarket market ${polyMarket.market_slug} to kalshi tickers [${tickers.join(", ")}]`);
             }
         } else {
@@ -53,7 +58,7 @@ export function buildPolyToKalshiBookMap(): PolymarketKalshiMapping {
         }
     }
 
-    return map;
+    return polyToKalshiMap;
 }
 
 // Polydate: ["2026","01","04"] -> Kalshi date: "26jan04"

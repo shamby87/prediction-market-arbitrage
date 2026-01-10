@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { CONFIG } from "./config";
 
 export async function logMsg(content: string, discord: boolean = false, notify: boolean = false) {
-  const msg = `[${new Date().toISOString()}] ${content}`;
+  const msg = `[${new Date().toLocaleString("en-US", {timeZone: "America/Chicago"})}] ${content}`;
   console.log(msg);
 
     if (discord) {

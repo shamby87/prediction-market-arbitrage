@@ -69,3 +69,10 @@ function isValidMarket(market: Market): boolean {
 
   return false;
 }
+
+export function getKalshiFee(price: number, quantity: number): number {
+  // Kalshi fee = round up(0.07 x C x P x (1-P)) where C is the number of contracts and P is the price in dollars.
+  // https://kalshi.com/docs/kalshi-fee-schedule.pdf
+  const fee = 0.07 * quantity * price * (1 - price);
+  return Math.ceil(fee * 100) / 100;
+}

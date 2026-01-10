@@ -1,5 +1,7 @@
 import WebSocket from "ws";
 import { CONFIG } from "../config";
+import { findArbFromPoly, findArbOpportunity } from "../arb";
+import { getConditionIdForTokenId } from "./polyClient";
 
 const books: Record<string, PolyOrderBook> = {};
 
@@ -32,7 +34,7 @@ interface PriceChangeMsg {
 
 function upsertLevel(side: OrderBookSide, price: number, size: number) {
   const idx = side.findIndex((lvl) => lvl.price === price);
-  if (size === 0) {
+  if (size <= 0) {
     if (idx >= 0) side.splice(idx, 1);
     return;
   }
@@ -65,6 +67,7 @@ function handleBook(msg: BookMsg) {
     .sort((a, b) => a.price - b.price);
 
   books[msg.asset_id] = { bids, asks };
+  findArbFromPoly(getConditionIdForTokenId(msg.asset_id) || "");
 }
 
 // Apply incremental price changes and track best bid/ask from each change.
@@ -85,31 +88,8 @@ function handlePriceChange(msg: PriceChangeMsg) {
       }
     }
 
-    // best_bid / best_ask are strings in each PriceChange; use them to correct top-of-book quickly.
-    if (pc.best_bid !== undefined) {
-      const bestBid = Number(pc.best_bid);
-      if (!Number.isNaN(bestBid)) {
-        // ensure best bid is present; size unknown -> keep existing size or 0
-        const existing = bids.find((lvl) => lvl.price === bestBid);
-        if (!existing) {
-          bids.unshift({ price: bestBid, size: 0 });
-        }
-        bids.sort((a, b) => b.price - a.price);
-      }
-    }
-
-    if (pc.best_ask !== undefined) {
-      const bestAsk = Number(pc.best_ask);
-      if (!Number.isNaN(bestAsk)) {
-        const existing = asks.find((lvl) => lvl.price === bestAsk);
-        if (!existing) {
-          asks.push({ price: bestAsk, size: 0 });
-        }
-        asks.sort((a, b) => a.price - b.price);
-      }
-    }
-
     books[tokenId] = { bids, asks };
+    findArbFromPoly(getConditionIdForTokenId(tokenId) || "");
   }
 }
 

@@ -3,6 +3,7 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { CONFIG } from "../config";
+import { findArbFromKalshi } from "../arb";
 
 export const kalshiBooks: Record<string, KalshiOrderBook> = {}; // ticker -> book
 
@@ -114,6 +115,8 @@ function handleSnapshot(msg: OrderbookSnapshotMsg) {
   no.sort((a, b) => b.price - a.price);
 
   kalshiBooks[tkr] = { yesBids: yes, noBids: no };
+
+  findArbFromKalshi(tkr);
 }
 
 function handleDelta(msg: OrderbookDeltaMsg) {
@@ -133,9 +136,7 @@ function handleDelta(msg: OrderbookDeltaMsg) {
 
   kalshiBooks[tkr] = book;
 
-  // if (tkr.toLowerCase() === `kxnbagame-26jan03minmia-mia`) {
-  //   console.log(`Pistons: ${JSON.stringify(kalshiBooks[tkr])}`);
-  // }
+  findArbFromKalshi(tkr);
 }
 
 export function connectKalshiOrderbook(marketTickers: string[]) {

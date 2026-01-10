@@ -8,6 +8,8 @@ export const polymarketMarkets: PolymarketMarkets = {
   lastUpdated: null,
 };
 
+const tokensToConditionId: Map<string, string> = new Map();
+
 export async function makeClobClient(): Promise<ClobClient> {
   const signer = new Wallet(CONFIG.polyPrivateKey);
 
@@ -54,6 +56,13 @@ export async function refreshPolymarketMarkets(client: ClobClient): Promise<void
   polymarketMarkets.markets = new Map(markets.map((m) => [m.condition_id, m]));
   polymarketMarkets.lastUpdated = new Date();
 
+  tokensToConditionId.clear();
+  for (const market of markets) {
+    for (const token of market.tokens) {
+      tokensToConditionId.set(token.token_id, market.condition_id);
+    }
+  }
+
   console.log(`Polymarket markets refreshed: ${markets.length} markets at ${polymarketMarkets.lastUpdated.toISOString()}`);
 }
 
@@ -69,13 +78,15 @@ function isValidMarket(market: PolymarketMarket): boolean {
 
   if (!market.tokens || market.tokens.length !== 2) return false;
 
-  // if (market.question.toUpperCase().includes("RAVENS") || market.question.toUpperCase().includes("STEELERS")) {
   if (market.description.toLowerCase().includes("in the upcoming nfl game") || market.description.toLowerCase().includes("in the upcoming nba game")) {
-      // console.log("Market: ", market.question);
       if (market.question.toLowerCase().includes("vs.")) {
         return true;
       }
   }
 
   return false;
+}
+
+export function getConditionIdForTokenId(tokenId: string): string | undefined {
+  return tokensToConditionId.get(tokenId);
 }

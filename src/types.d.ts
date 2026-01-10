@@ -51,7 +51,8 @@ interface MarketToken {
   winner: boolean;
 }
 
-type OrderBookSide = { price: number; size: number }[];
+type OrderBookOffer = { price: number; size: number };
+type OrderBookSide = OrderBookOffer[];
 
 interface PolyOrderBook {
   bids: OrderBookSide;
